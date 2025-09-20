@@ -1,0 +1,66 @@
+<!DOCTYPE html> <!-- 聲明HTML5文檔類型，確保瀏覽器以標準模式解析文檔 -->
+<html lang="zh-TW"> <!-- 設置HTML根元素，指定語言為繁體中文，有助於搜索引擎和無障礙工具 -->
+<head> <!-- 頁面頭部開始，包含元數據和外部資源鏈接 -->
+    <meta charset="UTF-8"> <!-- 設置字符編碼為UTF-8，支持中文字符顯示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 響應式設計視窗設置，適配移動設備 -->
+    <title>localhost</title> <!-- 設置瀏覽器標籤頁標題 -->
+    <link rel="stylesheet" href="style.css"> <!-- 鏈接外部CSS樣式表文件 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet"> <!-- 引入Google字體Noto Sans TC，支持中文顯示 -->
+</head> <!-- 頁面頭部結束 -->
+<body> <!-- 頁面主體開始，包含所有可見內容 -->
+    <div class="container"> <!-- 主容器，用於包裹整個遊戲界面，提供統一的樣式和佈局 -->
+        <header> <!-- 頁面頂部區域，包含遊戲標題和模式選擇器 -->
+            <h1 class="title">過三關</h1> <!-- 遊戲主標題，顯示"過三關"（井字遊戲） -->
+            <div class="mode-selector"> <!-- 遊戲模式選擇器容器 -->
+                <button id="humanVsAi" class="mode-btn active">AI對戰</button> <!-- AI對戰模式按鈕，默認選中狀態 -->
+                <button id="humanVsHuman" class="mode-btn">雙人對戰</button> <!-- 雙人對戰模式按鈕 -->
+            </div> <!-- 模式選擇器容器結束 -->
+        </header> <!-- 頁面頂部區域結束 -->
+
+        <div class="game-info"> <!-- 遊戲信息區域，顯示玩家信息和遊戲狀態 -->
+            <div class="player-info"> <!-- 玩家信息容器，顯示對戰雙方信息 -->
+                <div class="player player1"> <!-- 玩家一信息區域 -->
+                    <span class="player-symbol">X</span> <!-- 玩家一的棋子符號X -->
+                    <span class="player-name">玩家一</span> <!-- 玩家一的名稱顯示 -->
+                </div> <!-- 玩家一信息區域結束 -->
+                <div class="vs">VS</div> <!-- 對戰分隔符，顯示"VS" -->
+                <div class="player player2"> <!-- 玩家二信息區域 -->
+                    <span class="player-symbol">O</span> <!-- 玩家二的棋子符號O -->
+                    <span class="player-name" id="player2Name">電腦</span> <!-- 玩家二的名稱，根據模式動態變化 -->
+                </div> <!-- 玩家二信息區域結束 -->
+            </div> <!-- 玩家信息容器結束 -->
+            <div class="current-turn" id="currentTurn">輪到 X 玩家</div> <!-- 當前回合提示，顯示輪到哪位玩家 -->
+            <div class="game-status" id="gameStatus"></div> <!-- 遊戲狀態顯示區域，顯示勝負結果 -->
+        </div> <!-- 遊戲信息區域結束 -->
+
+        <div class="game-board" id="gameBoard"> <!-- 遊戲棋盤容器，3x3網格佈局 -->
+            <div class="cell" data-cell-index="0"></div> <!-- 棋盤格子0（左上角），存儲格子索引用於遊戲邏輯 -->
+            <div class="cell" data-cell-index="1"></div> <!-- 棋盤格子1（上中） -->
+            <div class="cell" data-cell-index="2"></div> <!-- 棋盤格子2（右上角） -->
+            <div class="cell" data-cell-index="3"></div> <!-- 棋盤格子3（左中） -->
+            <div class="cell" data-cell-index="4"></div> <!-- 棋盤格子4（正中心） -->
+            <div class="cell" data-cell-index="5"></div> <!-- 棋盤格子5（右中） -->
+            <div class="cell" data-cell-index="6"></div> <!-- 棋盤格子6（左下角） -->
+            <div class="cell" data-cell-index="7"></div> <!-- 棋盤格子7（下中） -->
+            <div class="cell" data-cell-index="8"></div> <!-- 棋盤格子8（右下角） -->
+        </div> <!-- 遊戲棋盤容器結束 -->
+
+        <div class="controls"> <!-- 遊戲控制區域，包含操作按鈕 -->
+            <button id="resetBtn" class="control-btn">重新開始</button> <!-- 重置遊戲按鈕，清空棋盤重新開始 -->
+        </div> <!-- 遊戲控制區域結束 -->
+    </div> <!-- 主容器結束 -->
+
+    <!-- 勝利模態框 --> <!-- 註釋：勝利彈窗區域說明 -->
+    <div id="victoryModal" class="victory-modal"> <!-- 勝利模態框容器，遊戲結束時彈出 -->
+        <div class="modal-content"> <!-- 模態框內容容器 -->
+            <h2 id="victoryMessage">恭喜獲勝！</h2> <!-- 勝利消息標題，根據遊戲結果動態變化 -->
+            <button id="playAgainBtn" class="play-again-btn">再玩一局</button> <!-- 再次遊戲按鈕 -->
+        </div> <!-- 模態框內容容器結束 -->
+    </div> <!-- 勝利模態框容器結束 -->
+
+    <!-- 煙花容器 --> <!-- 註釋：煙花特效區域說明 -->
+    <div id="fireworksContainer" class="fireworks-container"></div> <!-- 煙花特效容器，玩家獲勝時顯示慶祝動畫 -->
+
+    <script src="script.js"></script> <!-- 引入JavaScript文件，實現遊戲邏輯和交互功能 -->
+</body> <!-- 頁面主體結束 -->
+</html> <!-- HTML文檔結束 -->
