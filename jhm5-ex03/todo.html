@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提醒事項管理器</title>
+    <link rel="stylesheet" href="todo.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-bell"></i> 提醒事項管理器</h1>
+                <p>輕鬆管理您的日常提醒事項</p>
+            </div>
+            <div class="header-controls">
+                <button id="themeToggle" class="theme-toggle" title="切換主題">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="exportBtn" class="export-btn" title="匯出資料">
+                    <i class="fas fa-download"></i>
+                </button>
+                <input type="file" id="importInput" accept=".json" style="display: none;">
+                <button id="importBtn" class="import-btn" title="匯入資料">
+                    <i class="fas fa-upload"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="add-reminder-section">
+            <div class="input-group">
+                <label for="reminderInput" class="sr-only">提醒事項內容</label>
+                <input type="text" id="reminderInput" placeholder="輸入您的提醒事項..." maxlength="200" aria-label="提醒事項內容">
+
+                <label for="dueDateInput" class="sr-only">截止日期</label>
+                <input type="datetime-local" id="dueDateInput" class="due-date-input" aria-label="截止日期">
+
+                <label for="prioritySelect" class="sr-only">優先級</label>
+                <select id="prioritySelect" class="priority-select" aria-label="優先級">
+                    <option value="low">低優先級</option>
+                    <option value="medium" selected>中優先級</option>
+                    <option value="high">高優先級</option>
+                </select>
+
+                <label for="categorySelect" class="sr-only">分類</label>
+                <select id="categorySelect" class="category-select" aria-label="分類">
+                    <option value="personal">個人</option>
+                    <option value="work">工作</option>
+                    <option value="study">學習</option>
+                    <option value="health">健康</option>
+                    <option value="other">其他</option>
+                </select>
+
+                <button id="addBtn" class="add-btn">
+                    <i class="fas fa-plus"></i> 新增
+                </button>
+                <button id="templatesBtn" class="templates-btn" title="任務模板">
+                    <i class="fas fa-magic"></i> 模板
+                </button>
+            </div>
+
+            <!-- 任務模板快速選擇 -->
+            <div id="templatesPanel" class="templates-panel" style="display: none;">
+                <h4><i class="fas fa-magic"></i> 常用任務模板</h4>
+                <div class="templates-grid">
+                    <div class="template-item" data-template="morning">
+                        <i class="fas fa-sun"></i>
+                        <span>晨間例行</span>
+                    </div>
+                    <div class="template-item" data-template="meeting">
+                        <i class="fas fa-users"></i>
+                        <span>會議準備</span>
+                    </div>
+                    <div class="template-item" data-template="exercise">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>運動計劃</span>
+                    </div>
+                    <div class="template-item" data-template="study">
+                        <i class="fas fa-book"></i>
+                        <span>學習任務</span>
+                    </div>
+                    <div class="template-item" data-template="shopping">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>購物清單</span>
+                    </div>
+                    <div class="template-item" data-template="custom">
+                        <i class="fas fa-plus"></i>
+                        <span>自定義模板</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <label for="searchInput" class="sr-only">搜索提醒</label>
+                    <input type="text" id="searchInput" placeholder="搜索提醒..." aria-label="搜索提醒">
+                </div>
+
+                <div class="sort-controls">
+                    <label for="sortSelect">排序：</label>
+                    <select id="sortSelect" class="sort-select">
+                        <option value="created-desc">創建時間 (新→舊)</option>
+                        <option value="created-asc">創建時間 (舊→新)</option>
+                        <option value="due-asc">截止日期 (近→遠)</option>
+                        <option value="due-desc">截止日期 (遠→近)</option>
+                        <option value="priority-desc">優先級 (高→低)</option>
+                        <option value="priority-asc">優先級 (低→高)</option>
+                        <option value="alphabetical">字母順序</option>
+                    </select>
+                </div>
+
+                <div class="bulk-actions">
+                    <input type="checkbox" id="selectAllCheckbox" class="select-all-checkbox">
+                    <label for="selectAllCheckbox">全選</label>
+                    <button id="bulkCompleteBtn" class="bulk-btn" disabled>
+                        <i class="fas fa-check"></i> 批量完成
+                    </button>
+                    <button id="bulkDeleteBtn" class="bulk-btn delete" disabled>
+                        <i class="fas fa-trash"></i> 批量刪除
+                    </button>
+                </div>
+            </div>
+
+            <div class="reminder-stats">
+                <span class="stat">
+                    <i class="fas fa-list"></i>
+                    總計：<span id="totalCount">0</span>
+                </span>
+                <span class="stat">
+                    <i class="fas fa-check-circle"></i>
+                    已完成：<span id="completedCount">0</span>
+                </span>
+                <span class="stat">
+                    <i class="fas fa-clock"></i>
+                    待辦：<span id="pendingCount">0</span>
+                </span>
+                <span class="stat">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    過期：<span id="overdueCount">0</span>
+                </span>
+                <span class="stat">
+                    <i class="fas fa-calendar-day"></i>
+                    今日：<span id="todayCount">0</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="pending">待辦</button>
+            <button class="filter-btn" data-filter="completed">已完成</button>
+            <button class="filter-btn" data-filter="overdue">過期</button>
+            <button class="filter-btn" data-filter="today">今日</button>
+            <button class="filter-btn" data-filter="week">本週</button>
+            <button class="filter-btn" data-filter="high">高優先級</button>
+            <button class="filter-btn" data-filter="work">工作</button>
+            <button class="filter-btn" data-filter="personal">個人</button>
+        </div>
+
+        <div class="reminders-container">
+            <div id="remindersList" class="reminders-list">
+                <div class="empty-state">
+                    <i class="fas fa-calendar-plus"></i>
+                    <h3>還沒有提醒事項</h3>
+                    <p>開始新增您的第一個提醒吧！</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 統計圖表模態框 -->
+        <div id="statsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-chart-bar"></i> 統計報告</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>完成率</h3>
+                            <div class="completion-rate">
+                                <div class="progress-circle" data-percentage="0">
+                                    <span class="percentage">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>分類統計</h3>
+                            <div id="categoryChart" class="chart"></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>優先級分佈</h3>
+                            <div id="priorityChart" class="chart"></div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>每日完成數</h3>
+                            <div id="dailyChart" class="chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 番茄鐘模態框 -->
+        <div id="pomodoroModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-clock"></i> 番茄鐘計時器</h2>
+                    <span class="close" id="closePomodoroModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="pomodoro-container">
+                        <div class="timer-display">
+                            <div class="timer-circle">
+                                <div class="timer-text">
+                                    <span id="timerDisplay">25:00</span>
+                                    <div id="timerMode">專注時間</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timer-controls">
+                            <button id="startTimer" class="timer-btn start">
+                                <i class="fas fa-play"></i> 開始
+                            </button>
+                            <button id="pauseTimer" class="timer-btn pause" disabled>
+                                <i class="fas fa-pause"></i> 暫停
+                            </button>
+                            <button id="resetTimer" class="timer-btn reset">
+                                <i class="fas fa-stop"></i> 重置
+                            </button>
+                        </div>
+                        <div class="timer-settings">
+                            <div class="setting-item">
+                                <label for="focusTime">專注時間（分鐘）：</label>
+                                <input type="number" id="focusTime" value="25" min="1" max="60">
+                            </div>
+                            <div class="setting-item">
+                                <label for="shortBreak">短休息（分鐘）：</label>
+                                <input type="number" id="shortBreak" value="5" min="1" max="30">
+                            </div>
+                            <div class="setting-item">
+                                <label for="longBreak">長休息（分鐘）：</label>
+                                <input type="number" id="longBreak" value="15" min="1" max="60">
+                            </div>
+                        </div>
+                        <div class="pomodoro-stats">
+                            <div class="stat-item">
+                                <span>今日完成：</span>
+                                <span id="dailyPomodoros">0</span> 個番茄鐘
+                            </div>
+                            <div class="stat-item">
+                                <span>當前輪次：</span>
+                                <span id="currentRound">1</span> / 4
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 統計按鈕 -->
+        <button id="statsBtn" class="stats-btn" title="查看統計">
+            <i class="fas fa-chart-line"></i>
+        </button>
+
+        <!-- 番茄鐘按鈕 -->
+        <button id="pomodoroBtn" class="pomodoro-btn" title="番茄鐘計時器">
+            <i class="fas fa-clock"></i>
+        </button>
+    </div>
+
+    <script src="todo.js"></script>
+</body>
+</html>
